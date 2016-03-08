@@ -16,7 +16,7 @@ namespace DynDnsUpdater
     class Program
     {
         private const string CheckIpAddress = "http://checkip.dyndns.com/";
-        private const string UpdateIpAddress = "http://members.dyndns.org/nic/update?hostname={0}&myip={1}&wildcard=NOCHG";
+        private const string UpdateIpAddress = "https://dyndns.strato.com/nic/update?hostname={0}&myip={1}&wildcard=NOCHG";
 
         private static string _userName = "";
         private static string _password = "";
@@ -48,6 +48,8 @@ namespace DynDnsUpdater
                 Console.WriteLine("Update not necessary");
                 return;
             }
+            Settings.Default.IpAddress = ip;
+            Settings.Default.Save();
             var finalUrl = string.Format(UpdateIpAddress, _hostName, ip);
             var resultText = SendUpdate(finalUrl);
             Console.WriteLine(resultText);
@@ -106,7 +108,7 @@ namespace DynDnsUpdater
         {
             var client = new WebClient();
             client.Credentials = new NetworkCredential(_userName, _password);
-            client.Headers.Add("User-Agent:Malajo Solutions - Update Client - 1.0" + GetFileVersion());
+            client.Headers.Add("User-Agent:DNS Update Client - 1.0" + GetFileVersion());
             return client.DownloadString(url);
         }
 
