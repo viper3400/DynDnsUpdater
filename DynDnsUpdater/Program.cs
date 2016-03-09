@@ -124,7 +124,7 @@ namespace DynDnsUpdater
             }
             catch (Exception ex)
             {
-                Console.WriteLine("GetData", ex);
+                log.Error("GetData", ex);
             }
             return results;
         }
