@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using DynDnsUpdater.Properties;
-using Microsoft.SqlServer.Server;
 
 namespace DynDnsUpdater
 {
@@ -23,8 +18,15 @@ namespace DynDnsUpdater
         private static string _hostName = "";
         private static bool _isForce = false;
 
+        private static ILogger log;
+
         static void Main(string[] args)
         {
+            // Init logger
+            var assemblyPath = System.IO.Path.GetDirectoryName(
+                System.Reflection.Assembly.GetExecutingAssembly().Location);
+            log = new Log4NetLogger(typeof(Program), Path.Combine(assemblyPath, "log4net.config"));
+
             if (!args.Any())
             {
                 DisplayHelpText();
@@ -41,35 +43,35 @@ namespace DynDnsUpdater
             var ipText = PullIpAddress();
             if (string.IsNullOrEmpty(ipText)) { return; }
             var ip = ParseIpAddressText(ipText);
-            Console.WriteLine("Last Recorded IP Address: " + Settings.Default.IpAddress);
-            Console.WriteLine("Detected IP Address: " + ip);
+            log.Info("Last Recorded IP Address: " + Settings.Default.IpAddress);
+            log.Info("Detected IP Address: " + ip);
             if (Settings.Default.IpAddress == ip && !_isForce)
             {
-                Console.WriteLine("Update not necessary");
+                log.Info("Update not necessary");
                 return;
             }
             Settings.Default.IpAddress = ip;
             Settings.Default.Save();
             var finalUrl = string.Format(UpdateIpAddress, _hostName, ip);
             var resultText = SendUpdate(finalUrl);
-            Console.WriteLine(resultText);
+            log.Info(resultText);
         }
 
 
         public static void DisplayHelpText()
         {
-            Console.WriteLine("Updates Dyn.com hostname to current IP Address");
-            Console.WriteLine("");
-            Console.WriteLine("dyndnsupdater.exe /u:USERNAME /p:PASSWORD /h:HOSTNAME /f");
-            Console.WriteLine("");
-            Console.WriteLine("/u     Dyn.com username");
-            Console.WriteLine("/p     Dyn.com password");
-            Console.WriteLine("/h     Hostname to update.  Multiple hostnames can be included, separated by commas.");
-            Console.WriteLine("       When multiple hostnames are used, it may be necessary to use the /f switch to force an update.");
-            Console.WriteLine("       Once an update has been forced, the /f should not be necessary for subsequent updates.");
-            Console.WriteLine("/f     Force the hostname(s) recorded to be updated.  Over use of this feature may lead to being throttling");
-            Console.WriteLine("       or being completely blocked by dyn.com servers.  Only use when something is out of sync and does not");
-            Console.WriteLine("       become fixed by further updates.");
+            log.Error("Updates Dyn.com hostname to current IP Address");
+            log.Error("");
+            log.Error("dyndnsupdater.exe /u:USERNAME /p:PASSWORD /h:HOSTNAME /f");
+            log.Error("");
+            log.Error("/u     Dyn.com username");
+            log.Error("/p     Dyn.com password");
+            log.Error("/h     Hostname to update.  Multiple hostnames can be included, separated by commas.");
+            log.Error("       When multiple hostnames are used, it may be necessary to use the /f switch to force an update.");
+            log.Error("       Once an update has been forced, the /f should not be necessary for subsequent updates.");
+            log.Error("/f     Force the hostname(s) recorded to be updated.  Over use of this feature may lead to being throttling");
+            log.Error("       or being completely blocked by dyn.com servers.  Only use when something is out of sync and does not");
+            log.Error("       become fixed by further updates.");
         }
 
         public static void ParseArgs(string[] args)
