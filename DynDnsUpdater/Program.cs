@@ -11,7 +11,7 @@ namespace DynDnsUpdater
     class Program
     {
         private const string CheckIpAddress = "http://checkip.dyndns.com/";
-        private const string UpdateIpAddress = "https://dyndns.strato.com/nic/update?hostname={0}&myip={1}&wildcard=NOCHG";
+        private const string UpdateIpAddress = "{2}/nic/update?hostname={0}&myip={1}&wildcard=NOCHG";
 
         private static string _userName = "";
         private static string _password = "";
@@ -52,7 +52,8 @@ namespace DynDnsUpdater
             }
             Settings.Default.IpAddress = ip;
             Settings.Default.Save();
-            var finalUrl = string.Format(UpdateIpAddress, _hostName, ip);
+            log.Info("New IP Address will be propagated to: " + Settings.Default.UpdateServerName);
+            var finalUrl = string.Format(UpdateIpAddress, _hostName, ip, Settings.Default.UpdateServerName);
             var resultText = SendUpdate(finalUrl);
             log.Info(resultText);
         }

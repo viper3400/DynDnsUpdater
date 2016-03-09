@@ -5,5 +5,8 @@
     <Setting Name="IpAddress" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="UpdateServerName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">http://members.dyndns.org</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
