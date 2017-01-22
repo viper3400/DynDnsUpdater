@@ -3,7 +3,7 @@ A command line update client for dyn.com or any other provider with support for 
 
 Usage:
 ```
-dyndnsupdater.exe /u:USERNAME /p:PASSWORD /h:HOSTNAME /f{code}
+dyndnsupdater.exe /u:USERNAME /p:PASSWORD /h:HOSTNAME /f
 ```
 
 Next to this one time call you can place the command into a bat/cmd file and execute this job periodically, using the Windows in-build scheduled task functionality.
