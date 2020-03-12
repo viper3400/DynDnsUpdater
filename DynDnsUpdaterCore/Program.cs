@@ -1,6 +1,8 @@
 ﻿using CommandLine;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using NLog.Extensions.Logging;
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -19,21 +21,35 @@ namespace DynDnsUpdaterCore
         private static LocalIpStore ipStore;
         private static void ConfigureServices(IServiceCollection services)
         {
-            services.AddLogging(configure => configure.AddConsole().SetMinimumLevel(LogLevel.Trace));
+            var config = new ConfigurationBuilder()
+   .SetBasePath(System.IO.Directory.GetCurrentDirectory())
+   .Build();
+            services.AddLogging(loggingBuilder =>
+            {
+                // configure Logging with NLog
+                loggingBuilder.ClearProviders();
+                loggingBuilder.SetMinimumLevel(LogLevel.Trace);
+                loggingBuilder.AddNLog();
+            });
             services.AddSingleton<LocalIpStore>();
         }
         static void Main(string[] args)
         {
-            var parseResult = Parser.Default.ParseArguments<CommandLineOptions>(args)
-                .WithParsed(o => options = o);
-            if (parseResult.Tag != ParserResultType.Parsed) return;
-
             var serviceCollection = new ServiceCollection();
             ConfigureServices(serviceCollection);
 
             var serviceProvider = serviceCollection.BuildServiceProvider();
             log = serviceProvider.GetService<ILogger<Program>>();
             ipStore = serviceProvider.GetService<LocalIpStore>();
+
+            var parseResult = Parser.Default.ParseArguments<CommandLineOptions>(args)
+                .WithParsed(o => options = o);
+            if (parseResult.Tag != ParserResultType.Parsed)
+            {
+                log.LogError("Required arguments missing. Please see console output for usage.");
+                serviceProvider.Dispose();
+                return;
+            }
 
             var ipText = PullIpAddress();
             if (string.IsNullOrEmpty(ipText)) { return; }
