@@ -1,5 +1,51 @@
-# DynDnsUpdater
+# DynDnsUpdater & DynDnsUpdaterCore
 A command line update client for dyn.com or any other provider with support for [Remote Access Update API](https://help.dyn.com/remote-access-api) (i.e. strato.com).
+
+ * DynDnsUpdateCore (for .NET Core 3.1): Current and maintained version.
+ * DynDnsUpdater (for .NET Framework 4.5): Legacy and unmaintained version.
+
+## DynDnsUpdaterCore (for .NET Core 3.1)
+
+> ATTENTION: The call differs from the legacy version for .NET Framework 4.5!
+
+Usage:
+```
+dyndnsupdater.exe -u USERNAME -p PASSWORD -h HOSTNAME -f --provider https://dyndns.strato.com
+```
+Next to this one time call you can place the command into a bat/cmd file and execute this job periodically, using the Windows in-build scheduled task or Linux Cron functionality.
+
+As proposed by the [Remote Access Update API](https://help.dyn.com/remote-access-api) DynDnsUpdater will check the external ip of the current host by calling http://checkip.dyndns.com. The current ip will be saved under %LocalAppData%/DynDnsUpdater when running on windows and under a subdirectory when running on Linux. At the next runtime DynDnsUpdater copmares the current ip and the saved ip. Only if the ip has changed since the last time an update request is send to the ISP.
+
+By default DynDnsUpdater will uses dyn.com. If you like to use another ISP (with support for the protocol) you can user the --provider parameter.
+
+Full description of parameters:
+```
+  -u, --username    Required. Dyn.com (or other provider) username
+
+  -p, --password    Required. Dyn.com (or other provider) password
+
+  -h, --hostname    Required. Hostname to update. Multiple hostnames can be included, 
+                    separated by commas.
+                    When multiple hostnames are used, it may be necessary to use 
+                    the /f switch to force an update.
+                    Once an update has been forced, the /f should not be
+                    necessary for subsequent updates.
+
+  -f, --force       Force the hostname(s) recorded to be updated.
+                    Over use of this feature may lead to being throttling 
+                    or being completely blocked by dyn.com servers.
+                    Only use when something is out of sync and does not
+                    become fixed by further updates.
+
+  --provider        If you like to use another ISP with support for the 
+                    Remote Access Update API (i.e. https://dyndns.strato.com)
+
+  --help            Display this help screen.
+
+  --version         Display version information.
+```
+
+## DynDnsUpdater (for .NET Framework 4.5)
 
 Usage:
 ```
