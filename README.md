@@ -45,6 +45,11 @@ Full description of parameters:
   --version         Display version information.
 ```
 
+Publish for Linux (i.e. Ubuntu) (not self contained)
+```
+dotnet publish -c release -r linux-x64 /p:Version=2.0.1.0 --self-contained false
+```
+
 ## DynDnsUpdater (for .NET Framework 4.5)
 
 Usage:
